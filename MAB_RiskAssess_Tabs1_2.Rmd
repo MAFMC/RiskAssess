@@ -1,0 +1,114 @@
+---
+bibliography: riskassess.bib
+csl: plos.csl
+fontsize: 10pt
+geometry: left=2cm, right=2cm, top=2cm, bottom=2cm, footskip = .5cm
+link-citations: yes
+output:
+  bookdown::pdf_document2:
+    includes: 
+       in_header: latex/header_tabs.tex
+    toc: false   
+    keep_tex: true
+  bookdown::html_document2: 
+    toc: false
+    toc_float: true
+    code_fold: hide
+  bookdown::word_document2:
+    toc: false
+subparagraph: yes
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+
+# library(tint)
+# # invalidate cache when the package version changes
+# knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tint'))
+# options(htmltools.dir.version = FALSE)
+
+#Default Rmd options
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      #dev = "cairo_pdf",
+                      warning = FALSE,
+                      fig.width = 4,
+                      fig.asp = 0.45,
+                      fig.align = 'center'
+                      ) #allows for inserting R code into captions
+
+#Plotting and data libraries
+#remotes::install_github("noaa-edab/ecodata@0.1.0") #change to 2020 ecodata version for release
+library(tidyverse)
+library(tidyr)
+library(ecodata)
+library(here)
+library(kableExtra)
+library(patchwork)
+
+```
+
+\newpage
+\pagestyle{plain}
+\pagenumbering{gobble}
+
+```{r riskel, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+#tab.cap="Risk Elements, Definitions, and Indicators Used\\label{riskel}",
+
+elem <-read.table("riskelements2024.txt", sep="|", header=F, strip.white = T, stringsAsFactors = F)
+elem <- elem[,2:4]
+names(elem) <- c("Element", "Definition", "Indicator")
+
+# elem$Element <- factor(all$Element, levels=c("Assessment performance", "F status", "B status", "Food web  (Council Predator)", "Food web  (Council Prey)", "Food web  (Protected Species Prey)",
+#                                             "Ecosystem productivity", "Climate", "Distribution shifts", "Estuarine habitat", "Offshore habitat", "Commercial Revenue",
+#                                             "Recreational Angler Days/Trips", "Commercial Fishery Resilience (Revenue Diversity)", "Commercial Fishery Resilience (Shoreside Support)",
+#                                             "Fleet Resilience", "Social-Cultural", "Commercial", "Recreational", "Control", "Interactions", "Other ocean uses", "Regulatory complexity", 
+#                                             "Discards", "Allocation"))
+
+kable(elem, format = "latex", booktabs = T, longtable=T, caption="Risk Elements, Brief Definitions, and Indicators Used. Additional detail and information on each risk elements definition and indicator(s) can be found in the full risk assessment text.\\label{riskel}") %>%
+  kable_styling(font_size=8, latex_options=c("repeat_header", "striped")) %>%
+  column_spec(1, width="2.5cm") %>%
+  column_spec(2:3, width="7cm") %>%
+  group_rows("Ecological",1,11) %>%
+  group_rows("Economic",12,15) %>%
+  group_rows("Social",16,18) %>%
+  group_rows("Food Production",19,20) %>%
+  group_rows("Management",21,28)
+  #landscape()
+
+
+```
+ 
+
+\newpage
+\pagestyle{plain}
+
+```{r allcriteria,  echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+#tab.cap="Risk Ranking Criteria used for each Risk Element\\label{allcriteria}",
+
+all<-read.table("riskrankingcriteria2024.txt", sep="|", header=T, strip.white = T, stringsAsFactors = F)
+names(all) <- c("Element", "Ranking", "Criteria")
+all$Ranking <- factor(all$Ranking, levels=c("Low", "Low-Moderate",  "Moderate-High", "High"))
+all$Element <- factor(all$Element, levels=c("Assessment performance", "F status", "B status", "Food web (Prey availability)", "Food web (Predation pressure)", "Food web  (Protected species prey)",
+                                            "Ecosystem productivity", "Climate", "Distribution shifts", "Estuarine habitat", "Offshore habitat", "Commercial value",
+                                            "Recreational angler days/trips", "Commercial fishery resilience (Revenue diversity)", "Commercial fishery resilience (Shoreside support)",
+                                            "Commercial fishery resilience (Fleet diversity)", "Recreational fleet diversity", "Fishing community vulnerability", "Commercial fishing production", "Recreational fishing production", "F Control", "Tech Interactions", "Offshore wind (Bio/Ecosystem)", "Offshore wind (Science/Access)", "Other ocean activities", "Regulatory complexity", 
+                                            "Discards", "Allocation"))
+
+allwide <- all %>% 
+  spread(Ranking, Criteria)
+
+kable(allwide, format = "latex", booktabs = T, longtable=T, caption="Risk Ranking Criteria used for each Risk Element. Additional information on the risk ranking criteria can be found in the full risk assessment text.\\label{allcriteria}") %>%
+  kable_styling(font_size=8, latex_options=c("repeat_header", "striped")) %>%
+  column_spec(1, width="2cm") %>%
+  column_spec(2:5, width="5cm") %>%
+  landscape()
+
+
+```
+
+\clearpage
+\pagestyle{fancy}
+
